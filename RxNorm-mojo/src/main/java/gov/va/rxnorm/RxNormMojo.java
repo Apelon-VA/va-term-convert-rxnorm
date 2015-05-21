@@ -6,12 +6,12 @@ import gov.va.oia.terminology.converters.sharedUtils.propertyTypes.BPT_MemberRef
 import gov.va.oia.terminology.converters.sharedUtils.propertyTypes.Property;
 import gov.va.oia.terminology.converters.sharedUtils.propertyTypes.ValuePropertyPair;
 import gov.va.oia.terminology.converters.sharedUtils.stats.ConverterUUID;
-import gov.va.oia.terminology.converters.umlsUtils.RRFBaseConverterMojo;
-import gov.va.oia.terminology.converters.umlsUtils.RRFDatabaseHandle;
-import gov.va.oia.terminology.converters.umlsUtils.UMLSFileReader;
-import gov.va.oia.terminology.converters.umlsUtils.ValuePropertyPairWithAttributes;
-import gov.va.oia.terminology.converters.umlsUtils.rrf.REL;
-import gov.va.oia.terminology.converters.umlsUtils.sql.TableDefinition;
+import gov.va.oia.terminology.converters.sharedUtils.umlsUtils.RRFBaseConverterMojo;
+import gov.va.oia.terminology.converters.sharedUtils.umlsUtils.RRFDatabaseHandle;
+import gov.va.oia.terminology.converters.sharedUtils.umlsUtils.UMLSFileReader;
+import gov.va.oia.terminology.converters.sharedUtils.umlsUtils.ValuePropertyPairWithAttributes;
+import gov.va.oia.terminology.converters.sharedUtils.umlsUtils.rrf.REL;
+import gov.va.oia.terminology.converters.sharedUtils.umlsUtils.sql.TableDefinition;
 import gov.va.rxnorm.propertyTypes.PT_Annotations;
 import gov.va.rxnorm.rrf.RXNCONSO;
 import java.beans.PropertyVetoException;
@@ -50,7 +50,7 @@ import org.ihtsdo.otf.tcc.dto.component.relationship.TtkRelationshipChronicle;
 /**
  * Loader code to convert RxNorm into the workbench.
  */
-@Mojo( name = "convert-RxNormH-to-jbin", defaultPhase = LifecyclePhase.PROCESS_SOURCES )
+@Mojo( name = "convert-RxNorm-to-jbin", defaultPhase = LifecyclePhase.PROCESS_SOURCES )
 public class RxNormMojo extends RRFBaseConverterMojo
 {
 	private TtkConceptChronicle allCUIRefsetConcept_;
@@ -74,7 +74,7 @@ public class RxNormMojo extends RRFBaseConverterMojo
 			SimpleDateFormat sdf = new SimpleDateFormat("MMddYYYY");
 			long defaultTime = sdf.parse(fileNameDatePortion).getTime();
 			
-			init(outputDirectory, "RxNormH", "RXN", new PT_Annotations(), Arrays.asList(new String[] {"RXNORM"}), null,
+			init("RXN", new PT_Annotations(), Arrays.asList(new String[] {"RXNORM"}), null,
 					Arrays.asList(new String[] {"has_ingredient"}), defaultTime);
 			
 			allCUIRefsetConcept_ = ptUMLSRefsets_.getConcept(ptUMLSRefsets_.CUI_CONCEPTS.getSourcePropertyNameFSN());
@@ -166,7 +166,7 @@ public class RxNormMojo extends RRFBaseConverterMojo
 			conSat.close();
 			cuiRelStatementForward.close();
 			cuiRelStatementBackward.close();
-			finish(outputDirectory);
+			finish();
 			
 			db_.shutdown();
 		}

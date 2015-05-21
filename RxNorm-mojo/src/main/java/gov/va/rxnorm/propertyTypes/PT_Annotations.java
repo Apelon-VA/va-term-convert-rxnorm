@@ -18,12 +18,12 @@ public class PT_Annotations extends BPT_Annotations
 		addProperty("Source asserted atom identifier", null, "SAUI", null);
 		addProperty("Source asserted concept identifier", null, "SCUI", null);
 		addProperty("Source Vocabulary", null, "SAB", null, false, -1, 
-				new RefexDynamicColumnInfo[] { new RefexDynamicColumnInfo(null, 0, RefexDynamic.REFEX_COLUMN_VALUE.getPrimodialUuid(),
+				new RefexDynamicColumnInfo[] { new RefexDynamicColumnInfo(null, 0, RefexDynamic.DYNAMIC_SEMEME_COLUMN_VALUE.getPrimodialUuid(),
 				RefexDynamicDataType.UUID, null, true, null, null)});
 		addProperty("Code", null, "CODE", "\"Most useful\" source asserted identifier (if the source vocabulary has more than one identifier)" 
 				+ ", or a RxNorm-generated source entry identifier (if the source vocabulary has none.)");
 		addProperty("Suppress", null, "SUPPRESS", null, false, -1, 
-				new RefexDynamicColumnInfo[] { new RefexDynamicColumnInfo(null, 0, RefexDynamic.REFEX_COLUMN_VALUE.getPrimodialUuid(),
+				new RefexDynamicColumnInfo[] { new RefexDynamicColumnInfo(null, 0, RefexDynamic.DYNAMIC_SEMEME_COLUMN_VALUE.getPrimodialUuid(),
 				RefexDynamicDataType.UUID, null, true, null, null)});
 		addProperty("Term Type Class", null, "tty_class", null);
 		addProperty("STYPE", null, "The name of the column in RXNCONSO.RRF or RXNREL.RRF that contains the identifier to which the attribute is attached, e.g., CUI, AUI.");
@@ -32,13 +32,13 @@ public class PT_Annotations extends BPT_Annotations
 		addProperty("Source Asserted Attribute Identifier", null, "SATUI", "Source asserted attribute identifier (optional - present if it exists)");
 		addProperty("Semantic Type tree number", null, "STN", null);
 		addProperty("Semantic Type", null, "STY", null, false, -1, 
-				new RefexDynamicColumnInfo[] { new RefexDynamicColumnInfo(null, 0, RefexDynamic.REFEX_COLUMN_VALUE.getPrimodialUuid(),
+				new RefexDynamicColumnInfo[] { new RefexDynamicColumnInfo(null, 0, RefexDynamic.DYNAMIC_SEMEME_COLUMN_VALUE.getPrimodialUuid(),
 				RefexDynamicDataType.UUID, null, true, null, null)});
-		addProperty("Content View Flag", null, "CVF", "Bit field used to flag rows included in Content View.");//note - this is undocumented in RxNorm - used on the STY table - description comes from UMLS
+		addProperty("Content View Flag", null, "CVF", "Bit field used to flag rows included in Content View.");//note - this is undocumented in RxNorm - used on the STY table - description_ comes from UMLS
 		addProperty("URI");
 		addProperty("RG", null, "Machine generated and unverified indicator");
 		addProperty("Generic rel type", null, null, "Generic rel type for this relationship", false, -1, 
-				new RefexDynamicColumnInfo[] { new RefexDynamicColumnInfo(null, 0, RefexDynamic.REFEX_COLUMN_VALUE.getPrimodialUuid(),
+				new RefexDynamicColumnInfo[] { new RefexDynamicColumnInfo(null, 0, RefexDynamic.DYNAMIC_SEMEME_COLUMN_VALUE.getPrimodialUuid(),
 				RefexDynamicDataType.UUID, null, true, null, null)});		
 		
 		//Things that used to be IDs, below this point
