@@ -2,15 +2,15 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>gov.va.oia.terminology.source.RxNorm</groupId>
-	<artifactId>RxNorm-src-data</artifactId>
+	<groupId>gov.vha.isaac.terminology.source</groupId>
+	<artifactId>term-convert-rxnorm-src-data</artifactId>
 	<version>2014.09.02</version>
 	<packaging>pom</packaging>
 
 	<name>RxNorm Source Packager</name>
 	
 	<scm>
-		<url>https://csfe.aceworkspace.net/gerrit/gitweb?p=term-convert-rxnorm.git;tflink=projects.informatics_architecture/scm.term_convert_rxnorm</url>
+		<url>https://github.com/Apelon-VA/va-term-convert-rxnorm.git</url>
 	</scm>
 	
 	<licenses>
