@@ -13,7 +13,7 @@
 	<name>RxNorm eConcept Artifact Generator</name>
 
 	<properties>
-		<sourceData.version>2014.09.02</sourceData.version>
+		<sourceData.version>2015.08.03</sourceData.version>
 		<loader.version>4.2-SNAPSHOT</loader.version>
 		<!-- For no classifier, leave this blank-->
 		<resultArtifactClassifier></resultArtifactClassifier>
@@ -71,8 +71,8 @@
 						<configuration>
 							<artifactItems>
 								<artifactItem>
-									<groupId>gov.va.oia.terminology.source.RxNorm</groupId>  <!-- TODO this will be wrong with the next release of src data -->
-									<artifactId>RxNorm-src-data</artifactId>
+									<groupId>gov.vha.isaac.terminology.source</groupId>
+									<artifactId>term-convert-rxnorm-src-data</artifactId>
 									<version>${sourceData.version}</version>
 									<type>zip</type>
 								</artifactItem>
