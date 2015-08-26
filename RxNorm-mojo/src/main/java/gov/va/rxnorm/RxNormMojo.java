@@ -606,7 +606,7 @@ public class RxNormMojo extends RRFBaseConverterMojo
 	}
 
 	@Override
-	protected void processSAT(TtkComponentChronicle<?> itemToAnnotate, ResultSet rs, String itemCode, String itemSab, 
+	protected void processSAT(TtkComponentChronicle<?, ?> itemToAnnotate, ResultSet rs, String itemCode, String itemSab, 
 			List<BiFunction<String, String, Boolean>> customHandle) throws SQLException, PropertyVetoException
 	{
 		
