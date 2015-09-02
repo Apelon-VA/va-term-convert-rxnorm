@@ -114,6 +114,7 @@ public class RxNormMojo extends RRFBaseConverterMojo
 			//Rule from John - only allow TTY = IN and TTY = SCDC - need to preprocess, to find every RXCUI that we will end up creating as a concept
 			//so we can pass in this 'valid' list of concepts to the relationship gen code, so we don't generate rels outside of these concepts
 			allowedCUIs = new HashSet<>();
+			//TODO Jaqui says bring in SCD, some others.
 			ResultSet rs = statement.executeQuery("select RXCUI from RXNCONSO where SAB='RXNORM' and (TTY = 'IN' or TTY = 'SCDC')");
 			while (rs.next())
 			{
