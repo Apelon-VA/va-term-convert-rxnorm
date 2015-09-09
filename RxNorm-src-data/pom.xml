@@ -4,7 +4,7 @@
 
 	<groupId>gov.vha.isaac.terminology.source</groupId>
 	<artifactId>term-convert-rxnorm-src-data</artifactId>
-	<version>2014.09.02</version>
+	<version>2015.08.03</version>
 	<packaging>pom</packaging>
 
 	<name>RxNorm Source Packager</name>

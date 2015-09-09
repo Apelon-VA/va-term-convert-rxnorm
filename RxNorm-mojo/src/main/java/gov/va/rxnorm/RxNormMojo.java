@@ -71,7 +71,7 @@ public class RxNormMojo extends RRFBaseConverterMojo
 			outputDirectory.mkdir();
 
 			String fileNameDatePortion = loadDatabase();
-			SimpleDateFormat sdf = new SimpleDateFormat("MMddYYYY");
+			SimpleDateFormat sdf = new SimpleDateFormat("MMddyyyy");
 			long defaultTime = sdf.parse(fileNameDatePortion).getTime();
 			
 			init("RXN", new PT_Annotations(), Arrays.asList(new String[] {"RXNORM"}), null,
@@ -114,6 +114,7 @@ public class RxNormMojo extends RRFBaseConverterMojo
 			//Rule from John - only allow TTY = IN and TTY = SCDC - need to preprocess, to find every RXCUI that we will end up creating as a concept
 			//so we can pass in this 'valid' list of concepts to the relationship gen code, so we don't generate rels outside of these concepts
 			allowedCUIs = new HashSet<>();
+			//TODO Jaqui says bring in SCD, some others.
 			ResultSet rs = statement.executeQuery("select RXCUI from RXNCONSO where SAB='RXNORM' and (TTY = 'IN' or TTY = 'SCDC')");
 			while (rs.next())
 			{
@@ -606,7 +607,7 @@ public class RxNormMojo extends RRFBaseConverterMojo
 	}
 
 	@Override
-	protected void processSAT(TtkComponentChronicle<?> itemToAnnotate, ResultSet rs, String itemCode, String itemSab, 
+	protected void processSAT(TtkComponentChronicle<?, ?> itemToAnnotate, ResultSet rs, String itemCode, String itemSab, 
 			List<BiFunction<String, String, Boolean>> customHandle) throws SQLException, PropertyVetoException
 	{
 		
