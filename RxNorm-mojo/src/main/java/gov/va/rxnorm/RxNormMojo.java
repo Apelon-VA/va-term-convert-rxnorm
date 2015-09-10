@@ -59,7 +59,6 @@ public class RxNormMojo extends RRFBaseConverterMojo
 	
 	private PreparedStatement semanticTypeStatement, conSat, cuiRelStatementForward, cuiRelStatementBackward;
 	
-	private UUID rxNormIngredients;
 	private HashSet<String> allowedCUIs;
 	AtomicInteger skippedRelForNotMatchingCUIFilter = new AtomicInteger();
 	
@@ -80,12 +79,6 @@ public class RxNormMojo extends RRFBaseConverterMojo
 			allCUIRefsetConcept_ = ptUMLSRefsets_.getConcept(ptUMLSRefsets_.CUI_CONCEPTS.getSourcePropertyNameFSN());
 			
 			cpcRefsetConcept_ = ptRefsets_.get("RXNORM").getConcept(cpcRefsetConceptKey_);
-			
-			//special rule - create an ingredients concept
-			TtkConceptChronicle ingredients = eConcepts_.createConcept("RxNorm Ingredients", Snomed.PRODUCT.getUuids()[0]);
-			rxNormIngredients = ingredients.getPrimordialUuid();
-			
-			ingredients.writeExternal(dos_);
 
 			// Add version data to allRefsetConcept
 			eConcepts_.addStringAnnotation(allCUIRefsetConcept_, loaderVersion,  ptContentVersion_.LOADER_VERSION.getUUID(), Status.ACTIVE);
@@ -275,12 +268,6 @@ public class RxNormMojo extends RRFBaseConverterMojo
 
 		TtkConceptChronicle cuiConcept = eConcepts_.createConcept(createCUIConceptUUID(rxCui));
 		eConcepts_.addStringAnnotation(cuiConcept, rxCui, ptUMLSAttributes_.getProperty("RXCUI").getUUID(), Status.ACTIVE);
-		
-		//Special rule from John - if contains a IN TTY type - hang in from our RxNorm Ingredients concept.
-		if (uniqueTTYs.contains("IN"))
-		{
-			eConcepts_.addRelationship(cuiConcept, rxNormIngredients);
-		}
 
 		ArrayList<ValuePropertyPairWithSAB> cuiDescriptions = new ArrayList<>();
 		HashMap<String, ValuePropertyPairWithSAB> uniqueCodes = new HashMap<>();
