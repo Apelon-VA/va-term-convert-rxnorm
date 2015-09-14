@@ -14,6 +14,9 @@
 
 	<properties>
 		<sourceData.version>2015.08.03</sourceData.version>
+		<sctSourceDataVersion>20150731-loader-2.1</sctSourceDataVersion>
+		<sctSourceDataClassifier>Full</sctSourceDataClassifier>
+		
 		<loader.version>4.3-SNAPSHOT</loader.version>
 		<!-- For no classifier, leave this blank-->
 		<resultArtifactClassifier></resultArtifactClassifier>
@@ -77,7 +80,26 @@
 									<type>zip</type>
 								</artifactItem>
 							</artifactItems>
-							<outputDirectory>${project.build.directory}/generated-resources/src</outputDirectory>
+							<outputDirectory>${project.build.directory}/generated-resources/src/rxnorm</outputDirectory>
+						</configuration>
+					</execution>
+					<execution>
+						<id>fetch-SCT-src</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>gov.vha.isaac.terminology.converters</groupId>
+									<artifactId>term-convert-rf2-econcept-sct</artifactId>
+									<version>${sctSourceDataVersion}</version>
+									<type>jbin.zip</type>
+									<classifier>${sctSourceDataClassifier}</classifier>
+								</artifactItem>
+							</artifactItems>
+							<outputDirectory>${project.build.directory}/generated-resources/src/sct</outputDirectory>
 						</configuration>
 					</execution>
 				</executions>
@@ -96,7 +118,18 @@
 						<phase>generate-resources</phase>
 						<configuration>
 							<!-- See ConverterBaseMojo.java and LoincToEConcepts.java for configuration options -->
-							<inputFileLocation>${project.build.directory}/generated-resources/src</inputFileLocation>
+							<inputFileLocation>${project.build.directory}/generated-resources/src/rxnorm</inputFileLocation>
+							<sctInputFileLocation>${project.build.directory}/generated-resources/src/sct</sctInputFileLocation>
+							
+							<ttyRestriction>
+								<ttyRestriction>IN</ttyRestriction>
+								<ttyRestriction>SCD</ttyRestriction>
+								<ttyRestriction>SCDF</ttyRestriction>
+								<ttyRestriction>SCDG</ttyRestriction>
+								<ttyRestriction>DF</ttyRestriction>
+								<ttyRestriction>SBD</ttyRestriction>
+								<ttyRestriction>BN</ttyRestriction>
+							</ttyRestriction>
 							<!--Just an example -->
 							<!--annotationSkipList>
 								<annotationSkipList>SPECIES</annotationSkipList>
