@@ -460,7 +460,8 @@ public class RxNormMojo extends ConverterBaseMojo
 			
 			if (mergeOntoSCTConceptUUID.isPresent())
 			{
-				//Add the UUID we would have generated
+				//Add the UUID we would have generated  
+				//TODO need to debug, this doesn't seem to be working.
 				eConcepts_.addUUID(cuiConcept, cuiBasedUUID, ptSABs_.getProperty("RXNORM").getUUID());
 			}
 			
