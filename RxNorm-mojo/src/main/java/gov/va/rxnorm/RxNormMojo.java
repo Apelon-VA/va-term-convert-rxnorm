@@ -64,6 +64,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -75,6 +76,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BiFunction;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -131,15 +133,11 @@ public class RxNormMojo extends ConverterBaseMojo
 	
 	private HashMap<String, Boolean> mapToIsa = new HashMap<>();  //FSN, true or false - true for rel only, false for a rel and association representation
 	
-	//disabled debug code
-	//private HashSet<UUID> conceptUUIDsUsedInRels_ = new HashSet<>();
-	//private HashSet<UUID> conceptUUIDsCreated_ = new HashSet<>();
-
 	private TtkConceptChronicle allCUIRefsetConcept_;
 	private TtkConceptChronicle cpcRefsetConcept_;
 	public static final String cpcRefsetConceptKey_ = "Current Prescribable Content";
 	
-	private PreparedStatement semanticTypeStatement, conSat, ingredSubstanceMergeCheck, scdProductMergeCheck, cuiRelStatementForward, cuiRelStatementBackward,
+	private PreparedStatement semanticTypeStatement, descSat, ingredSubstanceMergeCheck, scdProductMergeCheck, cuiRelStatementForward, cuiRelStatementBackward,
 		satRelStatement_, hasTTYType_, scdgToSCTIngredient_;
 	
 	private HashSet<String> allowedCUIsForConcepts, allowedCUIsForRelationships;
@@ -156,6 +154,9 @@ public class RxNormMojo extends ConverterBaseMojo
 	private HashMap<Long, UUID> sctIDToUUID_ = null;
 	private HashMap<String, DoseForm> doseFormMappings_ = new HashMap<>();  //rxCUI to DoseForm
 	
+	//Format to parse 01/28/2010
+	private SimpleDateFormat dateParse = new SimpleDateFormat("MM/dd/yyyy");
+	
 	/**
 	 * An optional list of TTY types which should be included.  If left blank, we create concepts from all CUI's that are in the
 	 * SAB RxNorm.  If provided, we only create concepts where the RxCUI has an entry with a TTY that matches one of the TTY's provided here
@@ -169,7 +170,6 @@ public class RxNormMojo extends ConverterBaseMojo
 	 */
 	@Parameter (required = false)
 	protected File sctInputFileLocation;
-	
 	
 	@Override
 	public void execute() throws MojoExecutionException
@@ -189,7 +189,7 @@ public class RxNormMojo extends ConverterBaseMojo
 			eConcepts_.addStringAnnotation(allCUIRefsetConcept_, converterResultVersion, ptContentVersion_.RELEASE.getUUID(), Status.ACTIVE);
 			
 			semanticTypeStatement = db_.getConnection().prepareStatement("select TUI, ATUI, CVF from RXNSTY where RXCUI = ?");
-			conSat = db_.getConnection().prepareStatement("select * from RXNSAT where RXCUI = ? and RXAUI = ? and (SAB='RXNORM' or ATN='NDC')");
+			descSat = db_.getConnection().prepareStatement("select * from RXNSAT where RXCUI = ? and RXAUI = ? and (SAB='RXNORM' or ATN='NDC')");
 			
 			ingredSubstanceMergeCheck = db_.getConnection().prepareStatement("SELECT DISTINCT r2.code FROM RXNCONSO r1, RXNCONSO r2"
 					+ " WHERE r1.RXCUI = ?"
@@ -326,7 +326,7 @@ public class RxNormMojo extends ConverterBaseMojo
 			ConsoleUtil.println("Skipped " + skippedRelForNotMatchingCUIFilter + " relationships for linking to a concept we didn't include");
 
 			semanticTypeStatement.close();
-			conSat.close();
+			descSat.close();
 			ingredSubstanceMergeCheck.close();
 			scdProductMergeCheck.close();
 			cuiRelStatementForward.close();
@@ -589,15 +589,17 @@ public class RxNormMojo extends ConverterBaseMojo
 			
 			HashSet<String> uniqueUMLSCUI = new HashSet<>();
 			
+			AtomicLong foundDateForDescription = new AtomicLong(Long.MAX_VALUE);
+			
 			for (int i = 0; i < cuiDescriptions.size(); i++)
 			{
 				final TtkDescriptionChronicle desc = addedDescriptions.get(i);
 				ValuePropertyPairWithSAB descPP = cuiDescriptions.get(i);
 				//Add attributes from SAT table
-				conSat.clearParameters();
-				conSat.setString(1, rxCui);
-				conSat.setString(2, descPP.getStringAttribute(ptUMLSAttributes_.getProperty("RXAUI").getUUID()).get(0));  //There be 1 and only 1 of these
-				ResultSet rs = conSat.executeQuery();
+				descSat.clearParameters();
+				descSat.setString(1, rxCui);
+				descSat.setString(2, descPP.getStringAttribute(ptUMLSAttributes_.getProperty("RXAUI").getUUID()).get(0));  //There be 1 and only 1 of these
+				ResultSet rs = descSat.executeQuery();
 				
 				BiFunction<String, String, Boolean> functions = new BiFunction<String, String, Boolean>()
 				{
@@ -608,6 +610,25 @@ public class RxNormMojo extends ConverterBaseMojo
 						{
 							desc.setStatus(Status.INACTIVE);
 						}
+						if ("RXN_ACTIVATED".equals(atn))
+						{
+							try
+							{
+								long time = dateParse.parse(atv).getTime();
+								desc.setTime(time);
+								if (time < foundDateForDescription.get())
+								{
+									//set the time on the concept to the time from the oldest description
+									foundDateForDescription.set(time);
+									cuiConcept.getConceptAttributes().setTime(time);
+								}
+							}
+							catch (ParseException e)
+							{
+								throw new RuntimeException("Can't parse date?");
+							}
+						}
+
 						//Pull these up to the concept.
 						if ("UMLSCUI".equals(atn))
 						{
