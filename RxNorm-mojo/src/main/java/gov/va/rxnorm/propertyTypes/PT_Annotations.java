@@ -42,9 +42,9 @@ public class PT_Annotations extends BPT_Annotations
 				DynamicSememeDataType.UUID, null, true, null, null)});		
 		
 		//Things that used to be IDs, below this point
-		addProperty("RxNorm Unique identifier for concept", null, "RXCUI", "(RxNorm Concept ID)");
-		addProperty("Unique identifier of Semantic Type", null, "TUI", null);
-		addProperty("Unique identifier for Relationship", null, "RUI", null);
-		addProperty("Unique identifier for attribute", null, "ATUI", null);
+		addProperty("RXCUI", "RxNorm Concept ID", "RxNorm Unique identifier for concept");
+		addProperty("TUI", "RxNorm Semantic Type ID", "Unique identifier of Semantic Type");
+		addProperty("RUI", "RxNorm Relationship ID", "Unique identifier for Relationship");
+		addProperty("ATUI", "RxNorm Attribute ID", "Unique identifier for attribute");
 	}
 }
