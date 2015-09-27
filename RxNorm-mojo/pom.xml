@@ -4,19 +4,19 @@
 	<parent>
 		<groupId>gov.vha.isaac</groupId>
 		<artifactId>isaac-parent</artifactId>
-		<version>1.9</version>
+		<version>1.10</version>
 	</parent>
 
 	<groupId>gov.vha.isaac.terminology.converters</groupId>
 	<artifactId>term-convert-rxnorm-mojo</artifactId>
-	<version>4.2</version>
+	<version>4.3</version>
 	<packaging>maven-plugin</packaging>
 	
 	<name>RxNorm Converter Mojo</name>
 	
 	<!-- properties -->
 	<properties>
-		<term-convert-common-base.version>4.2</term-convert-common-base.version>
+		<term-convert-common-base.version>4.3</term-convert-common-base.version>
 	</properties>
 	
 	<scm>
