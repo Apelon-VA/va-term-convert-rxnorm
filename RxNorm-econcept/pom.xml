@@ -14,10 +14,10 @@
 
 	<properties>
 		<sourceData.version>2015.08.03</sourceData.version>
-		<sctSourceDataVersion>20150731-loader-2.2-SNAPSHOT</sctSourceDataVersion>
+		<sctSourceDataVersion>20150731-loader-2.2</sctSourceDataVersion>
 		<sctSourceDataClassifier>Full</sctSourceDataClassifier>
 		
-		<loader.version>4.3-SNAPSHOT</loader.version>
+		<loader.version>4.3</loader.version>
 		<!-- For no classifier, leave this blank-->
 		<resultArtifactClassifier></resultArtifactClassifier>
 	</properties>
