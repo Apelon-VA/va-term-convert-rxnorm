@@ -47,6 +47,7 @@ import gov.va.oia.terminology.converters.sharedUtils.umlsUtils.propertyTypes.PT_
 import gov.va.oia.terminology.converters.sharedUtils.umlsUtils.rrf.REL;
 import gov.va.oia.terminology.converters.sharedUtils.umlsUtils.sql.TableDefinition;
 import gov.va.rxnorm.DoseFormMapping.DoseForm;
+import gov.va.rxnorm.logicGraph.UNIT;
 import gov.va.rxnorm.propertyTypes.PT_Annotations;
 import gov.va.rxnorm.rrf.RXNCONSO;
 import gov.vha.isaac.metadata.source.IsaacMetadataAuxiliaryBinding;
@@ -170,11 +171,6 @@ public class RxNormMojo extends ConverterBaseMojo
 	 */
 	@Parameter (required = false)
 	protected File sctInputFileLocation;
-	
-	//these don't exist in snomed, need to create it for use with concrete domains
-	public static final UUID ACTUATION = UUID.fromString("145484a5-9fcb-532e-9c23-e6b696dfec95");
-	public static final UUID BAU = UUID.fromString("eda1f8b2-dc82-5721-98e7-aba1e60ccd4c");
-	public static final UUID CELLS = UUID.fromString("80f6b5b3-3b14-55bf-b611-23f57030bf21");
 	
 	@Override
 	public void execute() throws MojoExecutionException
@@ -1617,10 +1613,14 @@ public class RxNormMojo extends ConverterBaseMojo
 					eConcepts_.loadMetaDataItems(annotations, termSpecificMetadataRoot, dos_);
 				}
 				
-				//Special concept
-				eConcepts_.createMetaDataConcept(ACTUATION, "Actuation", "Actuation", null, null, annotations.getPropertyTypeUUID(), null, null, dos_);
-				eConcepts_.createMetaDataConcept(BAU, "Bioequivalent Allergy Units", "Bioequivalent Allergy Units", null, null, annotations.getPropertyTypeUUID(), null, null, dos_);
-				eConcepts_.createMetaDataConcept(CELLS, "Cells", "Cells", null, null, annotations.getPropertyTypeUUID(), null, null, dos_);
+				//Make special units concepts
+				for (UNIT u : UNIT.values())
+				{
+					if (!u.hasRealSCTConcept())
+					{
+						eConcepts_.createMetaDataConcept(u.getConceptUUID(), u.getFullName(), u.getFullName(), null, null, annotations.getPropertyTypeUUID(), null, null, dos_);
+					}
+				}
 				
 				ptTermAttributes_.put(sab, annotations);
 			}
