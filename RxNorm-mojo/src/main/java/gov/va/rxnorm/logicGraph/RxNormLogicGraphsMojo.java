@@ -71,13 +71,19 @@ import org.jvnet.hk2.annotations.Service;
 /**
  * Code to process the logic graphs into the ISAAC DB - things that can't be loaded via eConcept.
  * {@link RxNormLogicGraphsMojo}
+ * 
+ * This code is typically executed during the solor-goods/solor-all build on a live, running DB.
  *
  * @author <a href="mailto:daniel.armbrust.list@gmail.com">Dan Armbrust</a>
  */
 @Service(name = "load-rxnorm-logic-graphs")
 public class RxNormLogicGraphsMojo extends QuasiMojo
 {
-
+	int availStrengthCount = 0;
+	int newLogicGraphs = 0;
+	int modifiedLogicGraphs = 0;
+	int errors = 0;
+	
 	@Override
 	public void execute() throws MojoExecutionException
 	{
@@ -96,6 +102,10 @@ public class RxNormLogicGraphsMojo extends QuasiMojo
 
 		getLog().info("LOINC Tech Preview Processing Ends " + new Date().toString());
 		
+		getLog().info("Processed " + availStrengthCount + " strength annotations");
+		getLog().info("Created " + newLogicGraphs + " new logic graphs");
+		getLog().info("Modified " + modifiedLogicGraphs + " existing logic graphs");
+		getLog().info("Had errors processing  " + errors + " annotations");
 	}
 	
 	private class Worker extends TimedTask<Void>
@@ -119,6 +129,7 @@ public class RxNormLogicGraphsMojo extends QuasiMojo
 			HashMap<Integer, ArrayList<String>> entries = new HashMap<Integer, ArrayList<String>>();  //con nid to values
 			Get.sememeService().getSememesFromAssemblage(findAssemblageNid("RXN_AVAILABLE_STRENGTH")).forEach(sememe ->
 			{
+				availStrengthCount++;
 				try
 				{
 					@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -146,6 +157,7 @@ public class RxNormLogicGraphsMojo extends QuasiMojo
 				}	
 				catch (Exception e)
 				{
+					errors++;
 					getLog().error("Failed reading " + sememe, e);
 				}
 				
@@ -155,7 +167,6 @@ public class RxNormLogicGraphsMojo extends QuasiMojo
 			{
 				try
 				{
-						
 					Optional<LatestVersion<? extends LogicalExpression>> existingLogicExpr = Get.logicService().getLogicalExpression(item.getKey(), 
 							LogicCoordinates.getStandardElProfile().getStatedAssemblageSequence(), 
 							Get.configurationService().getDefaultStampCoordinate());
@@ -174,17 +185,6 @@ public class RxNormLogicGraphsMojo extends QuasiMojo
 						if (part.length() > 0)
 						{
 							Pair<Float, UNIT> parsed = parseSpecifics(part);
-							
-							//If we could use the builder (but we can't) it might look sort of like this:
-							//Just values
-//								NecessarySet(And(
-//										Feature(IsaacMetadataAuxiliaryBinding.HAS_STRENGTH, FloatLiteral(parsedNumerator.getKey(), leb))));
-							
-							//values and units
-//								NecessarySet(And(
-//										SomeRole(IsaacMetadataAuxiliaryBinding.ROLE_GROUP, And(
-//												Feature(IsaacMetadataAuxiliaryBinding.HAS_STRENGTH, FloatLiteral(parsed.getKey(), leb),
-//												SomeRole(unitConcept, ConceptAssertion(MLConceptFromParsedValue)))))));
 							
 							if (existing == null)
 							{
@@ -249,6 +249,7 @@ public class RxNormLogicGraphsMojo extends QuasiMojo
 						mls.setGraphData(existing.getData(DataTarget.INTERNAL));
 						
 						Get.commitService().addUncommitted(sc);
+						modifiedLogicGraphs++;
 					}
 					else
 					{
@@ -256,11 +257,13 @@ public class RxNormLogicGraphsMojo extends QuasiMojo
 						LogicalExpression le = leb.build();
 						Get.sememeBuilderService().getLogicalExpressionSememeBuilder(le, item.getKey(), 
 								LogicCoordinates.getStandardElProfile().getStatedAssemblageSequence()).build(ec, ChangeCheckerMode.ACTIVE);
+						newLogicGraphs++;
 					}
 					
 				}
 				catch (Exception e)
 				{
+					errors++;
 					getLog().error("Failed creating logic graph for concept id  " + item.getKey(), e);
 				}
 			}
