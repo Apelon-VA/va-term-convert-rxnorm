@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>gov.vha.isaac</groupId>
 		<artifactId>isaac-parent</artifactId>
-		<version>1.11-SNAPSHOT</version>
+		<version>1.10</version>
 	</parent>
 
 	<groupId>gov.vha.isaac.terminology.converters</groupId>
@@ -16,7 +16,7 @@
 	
 	<!-- properties -->
 	<properties>
-		<term-convert-common-base.version>4.4-SNAPSHOT</term-convert-common-base.version>
+		<term-convert-common-base.version>4.4</term-convert-common-base.version>
 	</properties>
 	
 	<scm>
