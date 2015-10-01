@@ -47,6 +47,7 @@ import gov.va.oia.terminology.converters.sharedUtils.umlsUtils.propertyTypes.PT_
 import gov.va.oia.terminology.converters.sharedUtils.umlsUtils.rrf.REL;
 import gov.va.oia.terminology.converters.sharedUtils.umlsUtils.sql.TableDefinition;
 import gov.va.rxnorm.DoseFormMapping.DoseForm;
+import gov.va.rxnorm.logicGraph.UNIT;
 import gov.va.rxnorm.propertyTypes.PT_Annotations;
 import gov.va.rxnorm.rrf.RXNCONSO;
 import gov.vha.isaac.metadata.source.IsaacMetadataAuxiliaryBinding;
@@ -152,6 +153,7 @@ public class RxNormMojo extends ConverterBaseMojo
 	private AtomicInteger doseFormMappedItemsCount_ = new AtomicInteger();
 	
 	private HashMap<Long, UUID> sctIDToUUID_ = null;
+	private HashMap<String, Optional<UUID>> mergeCache_ = new HashMap();  //rxcui to existing SCT concept
 	private HashMap<String, DoseForm> doseFormMappings_ = new HashMap<>();  //rxCUI to DoseForm
 	
 	//Format to parse 01/28/2010
@@ -170,11 +172,6 @@ public class RxNormMojo extends ConverterBaseMojo
 	 */
 	@Parameter (required = false)
 	protected File sctInputFileLocation;
-	
-	//these don't exist in snomed, need to create it for use with concrete domains
-	public static final UUID ACTUATION = UUID.fromString("145484a5-9fcb-532e-9c23-e6b696dfec95");
-	public static final UUID BAU = UUID.fromString("eda1f8b2-dc82-5721-98e7-aba1e60ccd4c");
-	public static final UUID CELLS = UUID.fromString("80f6b5b3-3b14-55bf-b611-23f57030bf21");
 	
 	@Override
 	public void execute() throws MojoExecutionException
@@ -257,7 +254,8 @@ public class RxNormMojo extends ConverterBaseMojo
 			HashSet<String> bannedSCTTargets = new HashSet<>();
 			if (sctIDToUUID_ != null)
 			{
-				rs = statement.executeQuery("SELECT DISTINCT RXCUI, CODE from RXNCONSO where SAB='" + sctSab_ + "'");
+				rs = statement.executeQuery("SELECT DISTINCT RXCUI, CODE from RXNCONSO r1 where r1.SAB='" + sctSab_ + "' and not exists "
+						+" (select rxcui from RXNCONSO r2 where r1.rxcui = r2.rxcui and r2.sab = 'RXNORM')");
 				while (rs.next())
 				{
 					String cui = rs.getString("RXCUI");
@@ -777,6 +775,11 @@ public class RxNormMojo extends ConverterBaseMojo
 		{
 			return Optional.empty();
 		}
+
+		if (mergeCache_.get(rxCui) != null)
+		{
+			return mergeCache_.get(rxCui);
+		}
 		
 		UUID snoConUUID = null;
 		
@@ -790,6 +793,7 @@ public class RxNormMojo extends ConverterBaseMojo
 				if (snoConUUID != null)
 				{
 					doseFormMappedItemsCount_.incrementAndGet();
+					mergeCache_.put(rxCui, Optional.of(snoConUUID));
 					return Optional.of(snoConUUID);
 				}
 			}
@@ -861,7 +865,7 @@ public class RxNormMojo extends ConverterBaseMojo
 			}
 		}
 		
-		
+		mergeCache_.put(rxCui, Optional.ofNullable(snoConUUID));
 		return Optional.ofNullable(snoConUUID);
 	}
 
@@ -1617,10 +1621,14 @@ public class RxNormMojo extends ConverterBaseMojo
 					eConcepts_.loadMetaDataItems(annotations, termSpecificMetadataRoot, dos_);
 				}
 				
-				//Special concept
-				eConcepts_.createMetaDataConcept(ACTUATION, "Actuation", "Actuation", null, null, annotations.getPropertyTypeUUID(), null, null, dos_);
-				eConcepts_.createMetaDataConcept(BAU, "Bioequivalent Allergy Units", "Bioequivalent Allergy Units", null, null, annotations.getPropertyTypeUUID(), null, null, dos_);
-				eConcepts_.createMetaDataConcept(CELLS, "Cells", "Cells", null, null, annotations.getPropertyTypeUUID(), null, null, dos_);
+				//Make special units concepts
+				for (UNIT u : UNIT.values())
+				{
+					if (!u.hasRealSCTConcept())
+					{
+						eConcepts_.createMetaDataConcept(u.getConceptUUID(), u.getFullName(), u.getFullName(), null, null, annotations.getPropertyTypeUUID(), null, null, dos_);
+					}
+				}
 				
 				ptTermAttributes_.put(sab, annotations);
 			}
@@ -2005,11 +2013,6 @@ public class RxNormMojo extends ConverterBaseMojo
 		return ConverterUUID.createNamespaceUUIDFromString("CUI:" + cui, true);
 	}
 	
-//	private UUID createCuiSabCodeConceptUUID(String cui, String sab, String code)
-//	{
-//		return ConverterUUID.createNamespaceUUIDFromString("CODE:" + cui + ":" + sab + ":" + code, true);
-//	}
-	
 	/**
 	 * @throws SQLException
 	 * @throws PropertyVetoException 
@@ -2017,19 +2020,21 @@ public class RxNormMojo extends ConverterBaseMojo
 	private int addRelationships(TtkConceptChronicle concept, List<REL> relationships) throws SQLException, PropertyVetoException
 	{
 		int createdCount = 0;
-		//preprocess - set up the source and target UUIDs for this rel, so we can identify duplicates.
-		//Note - the duplicates we are detecting here are rels that point to the same WB code concept, that occur 
-		//due to the way that we combine AUI's.  This is not detecting duplicates caused by forward/reverse rels in the UMLS.
 		for (REL relationship : relationships)
 		{
 			relationship.setSourceUUID(concept.getPrimordialUuid());
 			
 			if (relationship.getSourceAUI() == null)
 			{
+				
 				if (allowedSCTTargets.get(relationship.getTargetCUI()) != null)
 				{
 					//map to existing SCT concept
 					relationship.setTargetUUID(sctIDToUUID_.get(allowedSCTTargets.get(relationship.getTargetCUI())));
+				}
+				else if (sctMergeCheck(relationship.getTargetCUI()).isPresent())
+				{
+					relationship.setTargetUUID(sctMergeCheck(relationship.getTargetCUI()).get());
 				}
 				else
 				{
@@ -2089,10 +2094,6 @@ public class RxNormMojo extends ConverterBaseMojo
 					throw new RuntimeException("Unexpected rel handling");
 				}
 				createdCount++;
-
-				//disabled debug code
-				//conceptUUIDsUsedInRels_.add(concept.getPrimordialUuid());
-				//conceptUUIDsUsedInRels_.add(relationship.getTargetUUID());
 
 				//Add the annotations
 				HashSet<String> addedRUIs = new HashSet<>();
@@ -2156,7 +2157,19 @@ public class RxNormMojo extends ConverterBaseMojo
 			}
 			else
 			{
-				relCheckSkippedRel(relationship);
+				if (allowedSCTTargets.containsKey(relationship.getSourceCUI()))
+				{
+					//this is telling us there was a relationship from an SCT concept, to a RXNorm concept, but because we are 
+					//not processing sct concept CUIs, we will never process this one in the forward direction.
+					//For now, don't put it in the skip list.  
+					//Perhaps, in the future, we create a stub SCT concept, and create this association to the RxNorm concept
+					//but not now.
+				}
+				else
+				{
+					relCheckSkippedRel(relationship);
+				}
+				
 			}
 		}
 		return createdCount;
@@ -2265,7 +2278,10 @@ public class RxNormMojo extends ConverterBaseMojo
 	{
 		RxNormMojo mojo = new RxNormMojo();
 		mojo.outputDirectory = new File("../RxNorm-econcept/target");
-		mojo.inputFileLocation = new File("../RxNorm-econcept/target/generated-resources/src/");
+		mojo.inputFileLocation = new File("../RxNorm-econcept/target/generated-resources/src/rxnorm");
+		mojo.sctInputFileLocation = new File("../RxNorm-econcept/target/generated-resources/src/sct");
+		mojo.loaderVersion = "foo";
+		mojo.converterResultVersion = "bar";
 		mojo.execute();
 	}
 }
