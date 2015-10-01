@@ -100,7 +100,7 @@ public class RxNormLogicGraphsMojo extends QuasiMojo
 			throw new MojoExecutionException("Failure", e);
 		}
 
-		getLog().info("LOINC Tech Preview Processing Ends " + new Date().toString());
+		getLog().info("RxNorm Logic Graph Processing Ends " + new Date().toString());
 		
 		getLog().info("Processed " + availStrengthCount + " strength annotations");
 		getLog().info("Created " + newLogicGraphs + " new logic graphs");
