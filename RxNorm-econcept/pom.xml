@@ -2,29 +2,34 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>gov.vha.isaac.terminology.converters</groupId>
+		<artifactId>term-convert-RXNorm</artifactId>
+		<version>Test-RXNorm-2.0-SNAPSHOT</version>
+	</parent>
 
-	<groupId>gov.vha.isaac.terminology.converters</groupId>
+<!--	<groupId>gov.vha.isaac.terminology.converters</groupId> -->
 	<artifactId>term-convert-rxnorm-econcept</artifactId>
 	<!-- this should be set to ${sourceData.version}-loader-${loader.version} but that doesn't appease the maven gods that know best....
 		will leave it as is for now, and ignore the warnings. -->
-	<version>${sourceData.version}-loader-${loader.version}</version>
+<!--	<version>${sourceData.version}-loader-${loader.version}</version> -->
 	<packaging>pom</packaging>
 
 	<name>RxNorm eConcept Artifact Generator</name>
 
-	<properties>
+<!--	<properties>
 		<sourceData.version>2015.08.03</sourceData.version>
 		<sctSourceDataVersion>20150731-loader-2.2</sctSourceDataVersion>
 		<sctSourceDataClassifier>Full</sctSourceDataClassifier>
 		
 		<loader.version>4.5-SNAPSHOT</loader.version>
-		<!-- For no classifier, leave this blank-->
+		For no classifier, leave this blank
 		<resultArtifactClassifier></resultArtifactClassifier>
-	</properties>
+	</properties> -->
 	
-	<scm>
+<!--	<scm>
 		<url>https://github.com/Apelon-VA/va-term-convert-rxnorm.git</url>
-	</scm>
+	</scm> -->
 	
 	<licenses>
 		<license>

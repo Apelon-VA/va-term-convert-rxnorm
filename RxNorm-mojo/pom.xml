@@ -2,22 +2,22 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>gov.vha.isaac</groupId>
-		<artifactId>isaac-parent</artifactId>
-		<version>1.11-SNAPSHOT</version>
+		<groupId>gov.vha.isaac.terminology.converters</groupId>
+		<artifactId>term-convert-RXNorm</artifactId>
+		<version>Test-RXNorm-2.0-SNAPSHOT</version>
 	</parent>
 
-	<groupId>gov.vha.isaac.terminology.converters</groupId>
+<!--	<groupId>gov.vha.isaac.terminology.converters</groupId> -->
 	<artifactId>term-convert-rxnorm-mojo</artifactId>
-	<version>4.5-SNAPSHOT</version>
+<!--	<version>4.5-SNAPSHOT</version> -->
 	<packaging>maven-plugin</packaging>
 	
 	<name>RxNorm Converter Mojo</name>
 	
-	<!-- properties -->
+	<!-- properties 
 	<properties>
 		<term-convert-common-base.version>4.5-SNAPSHOT</term-convert-common-base.version>
-	</properties>
+	</properties> -->
 	
 	<scm>
 		<url>https://github.com/Apelon-VA/va-term-convert-rxnorm.git</url>

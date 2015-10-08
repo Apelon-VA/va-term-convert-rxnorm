@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>gov.vha.isaac</groupId>
+		<artifactId>isaac-parent</artifactId>
+		<version>1.11-SNAPSHOT</version>
+	</parent>
+	
+	<groupId>gov.vha.isaac.terminology.converters</groupId>
+	<artifactId>term-convert-RXNorm</artifactId>
+	<version>Test-RXNorm-2.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	
+	<name>RXNorm Tech Preview</name>
+	
+	<properties>
+		<sourceData.version>2015.08.03</sourceData.version>
+		<sctSourceDataVersion>20150731-loader-2.2</sctSourceDataVersion>
+		<sctSourceDataClassifier>Full</sctSourceDataClassifier>
+		
+		<loader.version>4.5-SNAPSHOT</loader.version>
+		<!-- For no classifier, leave this blank-->
+		<resultArtifactClassifier></resultArtifactClassifier>
+		<term-convert-common-base.version>4.5-SNAPSHOT</term-convert-common-base.version>
+	</properties>
+	
+	<scm>
+		<url>https://github.com/Apelon-VA/va-term-convert-rxnorm.git</url>
+	</scm>
+	
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+			<comments>Copyright Notice
+				This is a work of the U.S. Government and is not subject to copyright
+				protection in the United States. Foreign copyrights may apply.
+			</comments>
+		</license>
+		<license>
+			<name>RxNorm / UMLS license</name>
+			<url>https://uts.nlm.nih.gov/license.html</url>
+			<comments>The RxNorm content packaged by this module is governed licensed by the National Library of Medicine, Department of Health and Human Services</comments>
+		</license>
+		<license>
+			<name>SNOMED CT affiliate license agreement</name>
+			<url>https://uts.nlm.nih.gov/help/license/LicenseAgreement.pdf</url>
+			<comments>The SNOMED CT content packaged by this module is governed by the SNOMED CT affiliate license agreement</comments>
+		</license>
+	</licenses>
+	
+	<organization>
+		<name>U.S. Department of Veterans Affairs</name>
+		<url>www.va.gov</url>
+	</organization>
+
+	<dependencies>
+		
+	</dependencies>
+	
+	<profiles>
+		<!-- Nothing to do here, just in sub-modules. Listed here for documentation purposes -->
+		<profile>
+			<id>RxNorm-econcept-profile</id>
+			<build></build>
+		</profile>
+		<profile>
+			<id>RXNorm-mojo-profile</id>
+			<build></build>
+		</profile>
+		<profile>
+			<id>RXNorm-data-profile</id>
+			<build></build>
+		</profile>
+	</profiles>
+	<modules>
+		<module>RxNorm-econcept</module>
+		<module>RxNorm-mojo</module>
+		<!--		<module>RxNorm-src-data</module> -->
+	</modules>
+</project>
